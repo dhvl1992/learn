@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI/ML Flash Cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .flashcard-container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            background: #4CAF50;
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .flashcard {
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .flashcard-front {
+            background: white;
+        }
+
+        .flashcard-back {
+            background: #f8f9fa;
+            transform: rotateY(180deg);
+        }
+
+        .card-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+
+        .card-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-category {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            align-self: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .card-answer {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .card-hint {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 10px 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-style: italic;
+            color: #1976D2;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .navigation {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flip-hint {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .flashcard-inner {
+                height: 350px;
+            }
+            
+            .card-image {
+                height: 150px;
+            }
+            
+            .card-content {
+                padding: 20px;
+            }
+            
+            .card-question {
+                font-size: 1.1rem;
+            }
+            
+            .card-answer {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .navigation {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .no-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="flashcard-container">
+        <div class="header">
+            <h1>AI/ML Flash Cards</h1>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-text" id="progressText">Card 1 of 3</div>
+            </div>
+        </div>
+
+        <div class="flashcard" id="flashcard">
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <div class="card-image no-image" id="frontImage">🤖</div>
+                    <div class="card-content">
+                        <div class="card-category" id="category">AI Fundamentals</div>
+                        <div class="card-question" id="question">What is the difference between supervised and unsupervised learning?</div>
+                    </div>
+                </div>
+                <div class="flashcard-back">
+                    <div class="card-image no-image" id="backImage">📊</div>
+                    <div class="card-content">
+                        <div class="card-answer" id="answer">
+                            <strong>Supervised Learning:</strong> Uses labeled training data to learn patterns and make predictions (e.g., classification, regression).<br><br>
+                            <strong>Unsupervised Learning:</strong> Finds hidden patterns in unlabeled data without target outputs (e.g., clustering, dimensionality reduction).
+                        </div>
+                        <div class="card-hint">💡 Think: Supervised = teacher guides learning, Unsupervised = self-discovery</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flip-hint">Click card to flip</div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" id="prevBtn">← Previous</button>
+            <button class="btn btn-primary" id="flipBtn">Flip Card</button>
+            <div class="navigation">
+                <button class="btn btn-secondary" id="shuffleBtn">🔀 Shuffle</button>
+                <button class="btn btn-secondary" id="nextBtn">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARDS DATA - ADD YOUR CARDS HERE -->
+    <script>
+        // Deep Learning Flashcards - Ready to paste into your HTML file
+// Replace the flashcards array in your HTML with this one
+
+const flashcards = [
+    {
+        category: "Deep Learning Fundamentals",
+        question: "What is deep learning and what characterizes it?",
+        answer: "Deep learning is an approach to machine learning characterized by <strong>deep stacks of computations</strong>. This depth enables models to disentangle complex and hierarchical patterns in challenging real-world data, leading to human-level or superhuman performance in tasks like natural language translation, image recognition, and game playing.",
+        hint: "🧠 Think: Deep = many layers of computation stacked together",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🧠",
+        backEmoji: "🤖"
+    },
+    {
+        category: "Neural Network Basics",
+        question: "What is a linear unit (neuron) and what does it compute?",
+        answer: "A linear unit is the building block of neural networks. It computes a <strong>linear function</strong>: <code>y = wx + b</code><br><br>Where:<br>• <strong>w</strong> = weight<br>• <strong>x</strong> = input<br>• <strong>b</strong> = bias<br><br>Multiple inputs: <code>y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b</code>",
+        hint: "⚡ Remember: Weight × Input + Bias = Output",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "⚡",
+        backEmoji: "🔢"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you create a simple linear model in Keras?",
+        answer: "<strong>Basic Keras model structure:</strong><br><br><code>from tensorflow import keras<br>from tensorflow.keras import layers<br><br>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=1, input_shape=[3])<br>])</code><br><br>This creates a model with <strong>1 output unit</strong> accepting <strong>3 input features</strong>.",
+        hint: "💻 Sequential = simple stack of layers",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "💻",
+        backEmoji: "🔧"
+    },
+    {
+        category: "Keras Programming",
+        question: "What does input_shape=[3] mean in Keras?",
+        answer: "It tells Keras that the model will accept <strong>3 features as input</strong>. For tabular data, this represents the number of columns/features in your dataset.<br><br>Example: If your data has columns [age, income, score], then input_shape=[3].",
+        hint: "📊 Input shape = number of columns/features in your data",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📊",
+        backEmoji: "📋"
+    },
+    {
+        category: "Deep Learning Architecture",
+        question: "What are hidden layers and why are they important?",
+        answer: "Hidden layers are layers <strong>between input and output layers</strong>. They allow neural networks to learn <strong>complex, non-linear relationships</strong> by stacking multiple linear units and applying activation functions.<br><br><strong>Without hidden layers:</strong> Only linear relationships possible<br><strong>With hidden layers:</strong> Complex patterns and non-linear relationships",
+        hint: "🔗 Hidden layers = the secret sauce for complex patterns",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔗",
+        backEmoji: "🌐"
+    },
+    {
+        category: "Activation Functions",
+        question: "What is the ReLU activation function and why is it commonly used?",
+        answer: "<strong>ReLU (Rectified Linear Unit):</strong> <code>max(0, x)</code><br><br><strong>Function:</strong> Outputs input if positive, otherwise 0<br><br><strong>Why popular:</strong><br>• Computationally efficient<br>• Helps with vanishing gradient problem<br>• Enables learning of non-linear patterns<br>• Simple but effective",
+        hint: "🚀 ReLU: If positive, pass through; if negative, make zero",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🚀",
+        backEmoji: "📈"
+    },
+    {
+        category: "Activation Functions",
+        question: "Name three alternatives to ReLU and their characteristics.",
+        answer: "<strong>Three ReLU alternatives:</strong><br><br>• <strong>ELU (Exponential Linear Unit):</strong> Smooth for negative values, can output negative values<br><br>• <strong>SELU (Scaled ELU):</strong> Self-normalizing properties, good for deep networks<br><br>• <strong>Swish:</strong> Smooth, non-monotonic function that can outperform ReLU in some cases",
+        hint: "🔄 Each activation has its own strengths for different scenarios",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔄",
+        backEmoji: "⚙️"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you create a deep neural network with hidden layers in Keras?",
+        answer: "<strong>Deep network example:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=4, activation='relu', input_shape=[2]),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=3, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=1)<br>])</code><br><br>This creates a network with:<br>• Two hidden layers (4 and 3 units)<br>• One output layer",
+        hint: "🏗️ Stack layers like building blocks: Input → Hidden → Hidden → Output",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🏗️",
+        backEmoji: "🔨"
+    },
+    {
+        category: "Training & Optimization",
+        question: "What is Stochastic Gradient Descent and how does it work?",
+        answer: "<strong>SGD</strong> is an optimization algorithm that updates model weights using <strong>small random samples (minibatches)</strong> instead of the entire dataset.<br><br><strong>Process:</strong><br>• Take random sample of training data<br>• Calculate gradients<br>• Update weights to minimize loss<br>• Repeat<br><br><strong>Benefits:</strong> Faster training, often more robust",
+        hint: "🎯 SGD: Small steps using small batches = efficient learning",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🎯",
+        backEmoji: "📉"
+    },
+    {
+        category: "Training & Optimization",
+        question: "Define minibatch and epoch in neural network training.",
+        answer: "<strong>Key training terminology:</strong><br><br>• <strong>Minibatch (or batch):</strong> A small random sample of training data used in one iteration of SGD<br><br>• <strong>Epoch:</strong> One complete pass through the entire training dataset<br><br>Example: 1000 samples, batch size 100 = 10 batches per epoch",
+        hint: "🔄 Batch = small sample, Epoch = full dataset pass",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔄",
+        backEmoji: "📚"
+    },
+    {
+        category: "Loss Functions",
+        question: "Name three common loss functions for regression tasks and when to use them.",
+        answer: "<strong>Regression loss functions:</strong><br><br>• <strong>MAE (Mean Absolute Error):</strong> Less sensitive to outliers, measures average absolute differences<br><br>• <strong>MSE (Mean Squared Error):</strong> Penalizes larger errors more heavily, smooth gradient<br><br>• <strong>Huber Loss:</strong> Combines MAE and MSE benefits, robust to outliers while maintaining smoothness",
+        hint: "📏 Choose based on how you want to handle outliers",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📏",
+        backEmoji: "🎯"
+    },
+    {
+        category: "Training & Optimization",
+        question: "Compare SGD and Adam optimizers.",
+        answer: "<strong>SGD vs Adam:</strong><br><br><strong>SGD:</strong><br>• Simple algorithm<br>• Uses fixed learning rate<br>• Can be slow but reliable<br><br><strong>Adam:</strong><br>• Adaptive learning rates<br>• Faster convergence<br>• Combines momentum with adaptive learning<br>• Generally preferred for most applications",
+        hint: "🏃‍♂️ Adam = smarter, adaptive SGD for faster training",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🏃‍♂️",
+        backEmoji: "⚡"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you compile a Keras model for training?",
+        answer: "<strong>Model compilation syntax:</strong><br><br><code>model.compile(<br>&nbsp;&nbsp;&nbsp;&nbsp;optimizer='adam',<br>&nbsp;&nbsp;&nbsp;&nbsp;loss='mae',<br>&nbsp;&nbsp;&nbsp;&nbsp;metrics=['mae']<br>)</code><br><br><strong>Required components:</strong><br>• <strong>Optimizer:</strong> How to update weights<br>• <strong>Loss function:</strong> What to minimize<br>• <strong>Metrics:</strong> What to track during training",
+        hint: "⚙️ Compile = configure the training process",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "⚙️",
+        backEmoji: "🔧"
+    },
+    {
+        category: "Model Performance",
+        question: "What is overfitting and what are its signs?",
+        answer: "<strong>Overfitting:</strong> Model learns training data too well, including noise and irrelevant patterns.<br><br><strong>Signs of overfitting:</strong><br>• High training accuracy, poor validation/test performance<br>• Training loss decreases while validation loss increases<br>• Large gap between training and validation metrics",
+        hint: "📈📉 Good on training, bad on new data = overfitting",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📈",
+        backEmoji: "⚠️"
+    },
+    {
+        category: "Model Performance",
+        question: "What is underfitting and how can you identify it?",
+        answer: "<strong>Underfitting:</strong> Model is too simple to capture underlying data patterns.<br><br><strong>Signs of underfitting:</strong><br>• Poor performance on both training and validation sets<br>• Loss plateaus at high value for both training and validation<br>• Model seems too simple for the task complexity",
+        hint: "😴 Poor everywhere = underfitting (model too simple)",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "😴",
+        backEmoji: "📊"
+    },
+    {
+        category: "Model Performance",
+        question: "What is model capacity and how does it relate to overfitting/underfitting?",
+        answer: "<strong>Model capacity:</strong> The complexity and size of a model (number of parameters).<br><br><strong>Relationship:</strong><br>• <strong>Low capacity:</strong> Leads to underfitting<br>• <strong>High capacity:</strong> Can lead to overfitting<br>• <strong>Goal:</strong> Find the right capacity for optimal generalization",
+        hint: "⚖️ Goldilocks principle: not too simple, not too complex",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "⚖️",
+        backEmoji: "🎯"
+    },
+    {
+        category: "Regularization",
+        question: "What is early stopping and how does it prevent overfitting?",
+        answer: "<strong>Early stopping:</strong> Monitors validation performance and stops training when validation loss starts increasing while training loss continues decreasing.<br><br><strong>Prevention mechanism:</strong><br>• Stops at point of best generalization<br>• Prevents model from memorizing training data<br>• Automatic regularization technique",
+        hint: "🛑 Stop training at the sweet spot before overfitting begins",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🛑",
+        backEmoji: "📈"
+    },
+    {
+        category: "Model Performance",
+        question: "How can you increase model capacity in neural networks?",
+        answer: "<strong>Ways to increase capacity:</strong><br><br>• <strong>Add more hidden layers</strong> (making it deeper)<br>• <strong>Add more units to existing layers</strong> (making it wider)<br>• <strong>Combine both approaches</strong><br><br>Both methods add more parameters for the model to learn complex patterns.",
+        hint: "📏📐 Wider layers OR deeper network OR both = more capacity",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📏",
+        backEmoji: "🏗️"
+    },
+    {
+        category: "Regularization",
+        question: "What is dropout and how does it prevent overfitting?",
+        answer: "<strong>Dropout:</strong> Randomly sets a fraction of input units to 0 during training.<br><br><strong>Prevention mechanism:</strong><br>• Prevents over-dependence on specific neurons<br>• Forces learning of more robust features<br>• Creates ensemble effect<br>• Only applied during training, not inference",
+        hint: "🎲 Randomly 'turn off' neurons to prevent over-reliance",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🎲",
+        backEmoji: "🛡️"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you add dropout to a Keras model?",
+        answer: "<strong>Dropout implementation:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(512, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dropout(0.3),  # 30% dropout rate<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1)<br>])</code><br><br>The dropout layer is typically placed <strong>after Dense layers</strong>.",
+        hint: "💧 Add Dropout layer after Dense layers with a rate (e.g., 0.3 = 30%)",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "💧",
+        backEmoji: "🔧"
+    },
+    {
+        category: "Regularization",
+        question: "What is batch normalization and what problems does it solve?",
+        answer: "<strong>Batch normalization:</strong> Normalizes inputs to each layer, making training more stable and faster.<br><br><strong>Problems it solves:</strong><br>• Internal covariate shift<br>• Vanishing/exploding gradients<br>• Allows higher learning rates<br>• Acts as mild regularizer",
+        hint: "🔄 Normalize layer inputs = stable, faster training",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔄",
+        backEmoji: "⚡"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you add batch normalization to a Keras model?",
+        answer: "<strong>Batch normalization implementation:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(512),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.BatchNormalization(),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Activation('relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1)<br>])</code><br><br>BatchNormalization is typically applied <strong>before the activation function</strong>.",
+        hint: "📊 Order: Dense → BatchNorm → Activation",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📊",
+        backEmoji: "🔧"
+    },
+    {
+        category: "Regularization",
+        question: "In what order should you apply Dense layers, Batch Normalization, Dropout, and Activation?",
+        answer: "<strong>Typical order:</strong> Dense → Batch Normalization → Activation → Dropout<br><br><code>layers.Dense(units),<br>layers.BatchNormalization(),<br>layers.Activation('relu'),<br>layers.Dropout(rate)</code><br><br>This order optimizes training stability and regularization effectiveness.",
+        hint: "🔢 Remember: Dense → BatchNorm → Activation → Dropout",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔢",
+        backEmoji: "📋"
+    },
+    {
+        category: "Binary Classification",
+        question: "How does binary classification differ from regression in neural networks?",
+        answer: "<strong>Key differences:</strong><br><br><strong>Binary Classification:</strong><br>• Predicts one of two classes (0 or 1)<br>• Uses sigmoid activation in output layer<br>• Uses binary crossentropy loss<br><br><strong>Regression:</strong><br>• Predicts continuous values<br>• No activation (linear) in output layer<br>• Uses MSE/MAE loss",
+        hint: "🎯 Classification = categories, Regression = continuous numbers",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🎯",
+        backEmoji: "📊"
+    },
+    {
+        category: "Activation Functions",
+        question: "What is the sigmoid activation function and why is it used for binary classification?",
+        answer: "<strong>Sigmoid function:</strong> σ(x) = 1/(1 + e^(-x))<br><br><strong>Properties:</strong><br>• Maps any real number to value between 0 and 1<br>• Perfect for representing probabilities<br>• Output can be interpreted as probability of positive class<br>• Smooth, differentiable function",
+        hint: "📈 Sigmoid squashes any number into 0-1 probability range",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📈",
+        backEmoji: "🎲"
+    },
+    {
+        category: "Loss Functions",
+        question: "What is binary crossentropy and when is it used?",
+        answer: "<strong>Binary crossentropy:</strong> Standard loss function for binary classification.<br><br><strong>Formula:</strong> -[y*log(p) + (1-y)*log(1-p)]<br>Where y = true label, p = predicted probability<br><br><strong>Purpose:</strong> Measures difference between predicted probabilities and true binary labels",
+        hint: "📏 Measures how far predicted probabilities are from true labels",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📏",
+        backEmoji: "🎯"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you create a binary classification model in Keras?",
+        answer: "<strong>Binary classification model:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(4, activation='relu', input_shape=[33]),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(4, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1, activation='sigmoid')  # sigmoid for binary<br>])<br><br>model.compile(<br>&nbsp;&nbsp;&nbsp;&nbsp;optimizer='adam',<br>&nbsp;&nbsp;&nbsp;&nbsp;loss='binary_crossentropy',<br>&nbsp;&nbsp;&nbsp;&nbsp;metrics=['binary_accuracy']<br>)</code>",
+        hint: "🔧 Key: sigmoid output + binary_crossentropy loss",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔧",
+        backEmoji: "🎯"
+    },
+    {
+        category: "Keras Programming",
+        question: "What is keras.Sequential and when should you use it?",
+        answer: "<strong>keras.Sequential:</strong> Easiest way to create neural networks in Keras.<br><br><strong>Characteristics:</strong><br>• Creates linear stack of layers<br>• Each layer has one input and one output<br>• Data flows sequentially through layers<br><br><strong>Use when:</strong> Simple, straightforward architectures with linear flow",
+        hint: "📚 Sequential = simple stack of layers, one after another",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📚",
+        backEmoji: "🔗"
+    },
+    {
+        category: "Keras Programming",
+        question: "What does layers.Dense represent and what are its key parameters?",
+        answer: "<strong>layers.Dense:</strong> Fully-connected layer where each input connects to each output.<br><br><strong>Key parameters:</strong><br>• <strong>units:</strong> number of neurons/outputs<br>• <strong>activation:</strong> activation function to apply<br>• <strong>input_shape:</strong> shape of input data (only needed for first layer)",
+        hint: "🕸️ Dense = every input connected to every output",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🕸️",
+        backEmoji: "🔧"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you train a Keras model?",
+        answer: "<strong>Model training with fit():</strong><br><br><code>history = model.fit(<br>&nbsp;&nbsp;&nbsp;&nbsp;X_train, y_train,<br>&nbsp;&nbsp;&nbsp;&nbsp;validation_data=(X_valid, y_valid),<br>&nbsp;&nbsp;&nbsp;&nbsp;batch_size=256,<br>&nbsp;&nbsp;&nbsp;&nbsp;epochs=50,<br>&nbsp;&nbsp;&nbsp;&nbsp;verbose=0  # suppress output<br>)</code><br><br><code>fit()</code> trains the model and returns training history.",
+        hint: "🏃‍♂️ fit() does the actual training work",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🏃‍♂️",
+        backEmoji: "📈"
+    },
+    {
+        category: "Keras Programming",
+        question: "How do you evaluate model performance in Keras?",
+        answer: "<strong>Model evaluation methods:</strong><br><br><strong>Get loss and metrics:</strong><br><code>loss, accuracy = model.evaluate(X_test, y_test)</code><br><br><strong>Make predictions:</strong><br><code>predictions = model.predict(X_test)</code><br><br>Use <code>evaluate()</code> for final performance, <code>predict()</code> for actual predictions.",
+        hint: "📊 evaluate() = performance metrics, predict() = actual predictions",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "📊",
+        backEmoji: "🎯"
+    },
+    {
+        category: "Best Practices",
+        question: "When should you use different activation functions?",
+        answer: "<strong>Activation function guidelines:</strong><br><br>• <strong>ReLU:</strong> Default for hidden layers, fast and effective<br>• <strong>Sigmoid:</strong> Output layer for binary classification<br>• <strong>Softmax:</strong> Output layer for multi-class classification<br>• <strong>Linear (no activation):</strong> Output layer for regression<br>• <strong>ELU/SELU:</strong> When you need smooth derivatives",
+        hint: "🎛️ Choose activation based on layer position and task type",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🎛️",
+        backEmoji: "⚙️"
+    },
+    {
+        category: "Best Practices",
+        question: "How does learning rate affect training and what are good starting values?",
+        answer: "<strong>Learning rate effects:</strong><br><br>• <strong>Too high:</strong> Training unstable, loss explodes<br>• <strong>Too low:</strong> Very slow training, may get stuck<br><br><strong>Good starting points:</strong><br>• <strong>SGD:</strong> 0.01<br>• <strong>Adam:</strong> 0.001<br><br>Use learning rate scheduling or adaptive optimizers for best results.",
+        hint: "⚡ Start with 0.001 for Adam, 0.01 for SGD",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "⚡",
+        backEmoji: "🎯"
+    },
+    {
+        category: "Best Practices",
+        question: "List five strategies to prevent overfitting in deep learning.",
+        answer: "<strong>Overfitting prevention strategies:</strong><br><br>1. <strong>Early stopping:</strong> Stop when validation performance stops improving<br>2. <strong>Dropout:</strong> Randomly disable neurons during training<br>3. <strong>Batch normalization:</strong> Normalize layer inputs<br>4. <strong>Reduce model complexity:</strong> Fewer layers/units<br>5. <strong>Data augmentation:</strong> Increase training data variety",
+        hint: "🛡️ Multiple defenses work better than single approach",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🛡️",
+        backEmoji: "⚔️"
+    },
+    {
+        category: "Best Practices",
+        question: "What should you check when your neural network performs poorly?",
+        answer: "<strong>Debugging checklist:</strong><br><br>1. <strong>Data quality:</strong> Errors, missing values, proper preprocessing<br>2. <strong>Model capacity:</strong> Too simple (underfitting) or too complex (overfitting)<br>3. <strong>Learning rate:</strong> Too high or too low<br>4. <strong>Loss function:</strong> Appropriate for your task<br>5. <strong>Training time:</strong> Enough epochs vs early stopping<br>6. <strong>Feature scaling:</strong> Normalize/standardize inputs",
+        hint: "🔍 Systematic debugging: data → model → training → evaluation",
+        frontImage: "",
+        backImage: "",
+        frontEmoji: "🔍",
+        backEmoji: "🛠️"
+    }
+];
+
+        let currentCard = 0;
+        let isFlipped = false;
+
+        // DOM elements
+        const flashcard = document.getElementById('flashcard');
+        const category = document.getElementById('category');
+        const question = document.getElementById('question');
+        const answer = document.getElementById('answer');
+        const frontImage = document.getElementById('frontImage');
+        const backImage = document.getElementById('backImage');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const flipBtn = document.getElementById('flipBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+
+        function updateCard() {
+            const card = flashcards[currentCard];
+            
+            // Update content
+            category.textContent = card.category;
+            question.textContent = card.question;
+            answer.innerHTML = card.answer;
+            
+            // Update images or emojis
+            if (card.frontImage) {
+                frontImage.innerHTML = `<img src="${card.frontImage}" alt="Card image" style="width:100%;height:100%;object-fit:cover;">`;
+                frontImage.classList.remove('no-image');
+            } else {
+                frontImage.textContent = card.frontEmoji || '🎓';
+                frontImage.classList.add('no-image');
+            }
+            
+            if (card.backImage) {
+                backImage.innerHTML = `<img src="${card.backImage}" alt="Card image" style="width:100%;height:100%;object-fit:cover;">`;
+                backImage.classList.remove('no-image');
+            } else {
+                backImage.textContent = card.backEmoji || '💡';
+                backImage.classList.add('no-image');
+            }
+            
+            // Add hint if exists
+            const existingHint = document.querySelector('.card-hint');
+            if (existingHint) existingHint.remove();
+            
+            if (card.hint) {
+                const hintDiv = document.createElement('div');
+                hintDiv.className = 'card-hint';
+                hintDiv.textContent = card.hint;
+                document.querySelector('.flashcard-back .card-content').appendChild(hintDiv);
+            }
+            
+            // Update progress
+            const progress = ((currentCard + 1) / flashcards.length) * 100;
+            progressBar.style.width = progress + '%';
+            progressText.textContent = `Card ${currentCard + 1} of ${flashcards.length}`;
+            
+            // Reset flip state
+            isFlipped = false;
+            flashcard.classList.remove('flipped');
+            flipBtn.textContent = 'Flip Card';
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            flashcard.classList.toggle('flipped');
+            flipBtn.textContent = isFlipped ? 'Show Question' : 'Show Answer';
+        }
+
+        function nextCard() {
+            currentCard = (currentCard + 1) % flashcards.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
+            updateCard();
+        }
+
+        function shuffleCards() {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            currentCard = 0;
+            updateCard();
+        }
+
+        // Event listeners
+        flashcard.addEventListener('click', flipCard);
+        flipBtn.addEventListener('click', flipCard);
+        nextBtn.addEventListener('click', nextCard);
+        prevBtn.addEventListener('click', prevCard);
+        shuffleBtn.addEventListener('click', shuffleCards);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    prevCard();
+                    break;
+                case 'ArrowRight':
+                    nextCard();
+                    break;
+                case ' ':
+                case 'Enter':
+                    e.preventDefault();
+                    flipCard();
+                    break;
+            }
+        });
+
+        // Initialize
+        updateCard();
+    </script>
+</body>
+</html>
