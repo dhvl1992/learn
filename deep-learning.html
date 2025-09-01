@@ -15,27 +15,34 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .flashcard-container {
-            max-width: 500px;
-            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             color: white;
+            position: sticky;
+            top: 20px;
+            z-index: 10;
         }
 
         .header h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
         .flashcard {
@@ -43,12 +50,12 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            margin-bottom: 25px;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .flashcard:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .card-header {
@@ -113,71 +120,24 @@
             border-left: 4px solid #2196f3;
         }
 
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 30px;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #333;
-            border: 2px solid #ddd;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn:active {
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn:disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .navigation {
-            display: flex;
-            gap: 10px;
-        }
-
-        .study-tip {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            margin-top: 15px;
-            font-style: italic;
         }
 
         /* Mobile Responsiveness */
         @media (max-width: 480px) {
+            body {
+                padding: 20px 15px;
+            }
+
             .flashcard-container {
                 max-width: 100%;
             }
@@ -188,6 +148,7 @@
             
             .card-header {
                 padding: 20px 20px 15px;
+                position: relative;
             }
 
             .card-body {
@@ -196,20 +157,11 @@
 
             .card-question {
                 font-size: 1.2rem;
+                padding-right: 50px;
             }
             
             .card-answer {
                 font-size: 1rem;
-            }
-            
-            .controls {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
             }
 
             .card-image-container {
@@ -219,22 +171,44 @@
             .card-image-container img {
                 max-height: 200px;
             }
+
+            .cards-container {
+                gap: 20px;
+            }
         }
 
         /* Smooth animations */
         .flashcard {
-            animation: slideIn 0.5s ease-out;
+            animation: fadeInUp 0.6s ease-out;
         }
 
-        @keyframes slideIn {
+        .flashcard:nth-child(2) { animation-delay: 0.1s; }
+        .flashcard:nth-child(3) { animation-delay: 0.2s; }
+        .flashcard:nth-child(4) { animation-delay: 0.3s; }
+        .flashcard:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .scroll-indicator {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            font-style: italic;
         }
     </style>
 </head>
@@ -244,346 +218,295 @@
             <h1>Learning Content</h1>
         </div>
 
-        <div class="flashcard" id="flashcard">
-            <div class="card-header">
-                <div class="card-question" id="question">What is the difference between supervised and unsupervised learning?</div>
-            </div>
-
-            <div class="card-image-container" id="imageContainer" style="display: none;">
-                <img id="cardImage" alt="Learning content" />
-            </div>
-            
-            <div class="card-body">
-                <div class="answer-section">
-                    <div class="answer-label">💡 Answer</div>
-                    <div class="card-answer" id="answer">
-                        <strong>Supervised Learning:</strong> Uses labeled training data to learn patterns and make predictions (e.g., classification, regression).<br><br>
-                        <strong>Unsupervised Learning:</strong> Finds hidden patterns in unlabeled data without target outputs (e.g., clustering, dimensionality reduction).
-                    </div>
-                </div>
-                
-                <div class="card-hint" id="hintSection">
-                    💡 Think: Supervised = teacher guides learning, Unsupervised = self-discovery
-                </div>
-            </div>
+        <div class="cards-container" id="cardsContainer">
+            <!-- Cards will be dynamically generated here -->
         </div>
 
-        <div class="study-tip">Use arrow keys to navigate</div>
-
-        <div class="controls">
-            <button class="btn btn-secondary" id="prevBtn">← Previous</button>
-            <button class="btn btn-primary" id="nextBtn">Next →</button>
+        <div class="scroll-indicator">
+            Scroll to explore all content
         </div>
     </div>
 
-    <!-- CARDS DATA - ADD YOUR CARDS HERE -->
     <script>
         const flashcards = [
     {
         question: "What is deep learning and what characterizes it?",
-        answer: "Deep learning is an approach to machine learning characterized by <strong>deep stacks of computations</strong>. This depth enables models to disentangle complex and hierarchical patterns in challenging real-world data, leading to human-level or superhuman performance in tasks like <strong>natural language translation</strong>, <strong>image recognition</strong>, and <strong>game playing</strong>.",
+        answer: "Deep learning is an approach to machine learning characterized by <strong>deep stacks of computations</strong>. This depth enables models to disentangle complex and hierarchical patterns in challenging real-world data, achieving <strong>human-level or superhuman performance</strong> in tasks like natural language translation, image recognition, and game playing.",
         hint: "🧠 Think: Deep = many layers of computation stacked together",
         image: ""
     },
     {
-        question: "What is a linear unit (neuron) and what does it compute?",
-        answer: "A linear unit is the <strong>building block of neural networks</strong>. It computes a linear function:<br><br><strong>Single input:</strong> y = wx + b<br><strong>Multiple inputs:</strong> y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b<br><br>Where <strong>w</strong> = weight, <strong>x</strong> = input, <strong>b</strong> = bias",
-        hint: "⚡ Remember: Weight × Input + Bias = Output",
+        question: "What is a neuron in artificial neural networks?",
+        answer: "A neuron is the <strong>fundamental unit</strong> of a neural network. It has multiple weighted inputs and a bias that combine to produce a numerical output.<br><br><strong>Formula:</strong> y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b<br><br>Think of it like <strong>Excel's SUMPRODUCT function</strong> - multiply each input by its weight and sum them all up.",
+        hint: "⚡ Like SUMPRODUCT in Excel - weighted inputs plus bias",
         image: ""
     },
     {
-        question: "How do you create a simple linear model in Keras?",
-        answer: "<strong>Basic Keras model syntax:</strong><br><br><code>from tensorflow import keras<br>from tensorflow.keras import layers<br><br>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=1, input_shape=[3])<br>])</code><br><br>This creates a model with <strong>1 output unit</strong> accepting <strong>3 input features</strong>.",
-        hint: "💻 Sequential = simple stack of layers",
+        question: "How do weights and bias work in a neuron?",
+        answer: "<strong>Weights determine input importance:</strong><br>• Large positive = very important positive correlation<br>• Large negative = important inverse correlation<br>• Small values = less important<br><br><strong>Bias provides direction correction</strong>, pushing the neuron's output in a certain direction<br><br><strong>Key:</strong> Higher absolute weight = Higher importance regardless of sign",
+        hint: "⚖️ Weights = importance, Bias = direction adjustment",
         image: ""
     },
     {
-        question: "What does input_shape=[3] mean in Keras?",
-        answer: "It tells Keras that the model will accept <strong>3 features as input</strong>. For tabular data, this represents the <strong>number of columns/features</strong> in your dataset.<br><br><strong>Example:</strong> If your data has columns [age, income, score], then input_shape=[3]",
-        hint: "📊 Input shape = number of columns in your data",
+        question: "Describe the visual structure of an artificial neuron",
+        answer: "A neuron is represented as a <strong>center circle connected to all input values</strong>. The connecting lines have weight values. It performs a <strong>weighted sum</strong> where higher weights have more influence. The result is summed in the center to produce the output.<br><br>It's exactly like doing <strong>SUMPRODUCT in Excel</strong>.",
+        hint: "🔵 Center circle with weighted connections - like Excel SUMPRODUCT",
         image: ""
     },
     {
-        question: "What are hidden layers and why are they important?",
-        answer: "Hidden layers are layers <strong>between input and output layers</strong>. They enable neural networks to learn <strong>complex, non-linear relationships</strong> by stacking multiple linear units with activation functions.<br><br><strong>Without hidden layers:</strong> Only linear relationships<br><strong>With hidden layers:</strong> Complex patterns and non-linear relationships",
+        question: "What is a layer in neural networks?",
+        answer: "A layer is <strong>multiple neurons at the same level</strong>, all using the same activation function. If you set <code>units=4</code> in Keras, you get one layer with <strong>4 neurons at the same level</strong>.<br><br>Networks are built by <strong>stacking multiple layers</strong>.",
+        hint: "🏢 Layer = floor of building with multiple rooms (neurons)",
+        image: ""
+    },
+    {
+        question: "What are hidden layers and why are they crucial?",
+        answer: "Hidden layers are layers <strong>between input and output layers</strong>. They allow neural networks to learn <strong>complex, non-linear relationships</strong> by stacking multiple linear units with activation functions.<br><br><strong>Without hidden layers:</strong> Only linear relationships possible<br><strong>With hidden layers:</strong> Complex patterns and non-linear relationships",
         hint: "🔗 Hidden layers = the magic for learning complex patterns",
         image: ""
     },
     {
-        question: "What is the ReLU activation function and why is it popular?",
-        answer: "<strong>ReLU (Rectified Linear Unit):</strong> max(0, x)<br><br><strong>Function:</strong> Outputs input if positive, otherwise 0<br><br><strong>Why popular:</strong><br>• Computationally efficient<br>• Helps with vanishing gradient problem<br>• Enables learning non-linear patterns<br>• Simple but effective",
+        question: "What is ReLU and why is it commonly used?",
+        answer: "<strong>ReLU (Rectified Linear Unit):</strong> max(0, x)<br><br>Outputs the input if positive, otherwise 0.<br><br><strong>Why popular:</strong><br>• Computationally efficient<br>• Helps with vanishing gradient problems<br>• Enables learning non-linear patterns<br>• Simple but effective",
         hint: "🚀 ReLU: Positive values pass through, negative becomes zero",
         image: ""
     },
     {
-        question: "Name three alternatives to ReLU and their characteristics",
-        answer: "<strong>ReLU alternatives:</strong><br><br>• <strong>ELU (Exponential Linear Unit):</strong> Smooth for negative values, can output negative values<br><br>• <strong>SELU (Scaled ELU):</strong> Self-normalizing properties, good for deep networks<br><br>• <strong>Swish:</strong> Smooth, non-monotonic function that can outperform ReLU",
-        hint: "🔄 Each activation has unique strengths for different scenarios",
+        question: "When should you use different activation functions?",
+        answer: "<strong>Function by use case:</strong><br>• <strong>ELU:</strong> Smooth for negative values, can output negatives<br>• <strong>SELU:</strong> Self-normalizing, good for deep networks<br>• <strong>Swish:</strong> Smooth, non-monotonic, can outperform ReLU<br>• <strong>Sigmoid:</strong> Output layer for binary classification (0-1 probability)<br>• <strong>Softmax:</strong> Output layer for multi-class classification<br>• <strong>Linear/None:</strong> Output layer for regression",
+        hint: "🎛️ Choose activation based on layer position and task type",
         image: ""
     },
     {
-        question: "How do you create a deep neural network in Keras?",
-        answer: "<strong>Deep network example:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=4, activation='relu', input_shape=[2]),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=3, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=1)<br>])</code><br><br>Creates a network with <strong>two hidden layers</strong> (4 and 3 units) and <strong>one output layer</strong>",
-        hint: "🏗️ Stack layers: Input → Hidden → Hidden → Output",
+        question: "How do you create neural networks in Keras?",
+        answer: "Use <strong>keras.Sequential</strong> for linear layer stacks:<br><br><code>from tensorflow import keras<br>from tensorflow.keras import layers<br><br>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=4, activation='relu', input_shape=[3]),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=7, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(units=1)  # output layer<br>])</code>",
+        hint: "📚 Sequential = simple stack of layers, one after another",
         image: ""
     },
     {
-        question: "What is Stochastic Gradient Descent (SGD)?",
-        answer: "<strong>SGD</strong> is an optimization algorithm that updates model weights using <strong>small random samples (minibatches)</strong> instead of the entire dataset.<br><br><strong>Process:</strong><br>• Take random sample of training data<br>• Calculate gradients<br>• Update weights to minimize loss<br>• Repeat<br><br><strong>Benefits:</strong> Faster training, often more robust",
-        hint: "🎯 SGD: Small steps with small batches = efficient learning",
+        question: "What does 'units' mean in Keras Dense layers?",
+        answer: "<strong>Units</strong> specifies the <strong>number of neurons at the OUTPUT</strong> of that layer. Each neuron outputs a single value.<br><br><strong>Example:</strong> If you have <code>input_shape=[3]</code> and first layer has <code>units=128</code>, you go from <strong>3 inputs to 128 outputs</strong>, and the next layer starts with 128 inputs.",
+        hint: "🔢 Units = number of output neurons from that layer",
         image: ""
     },
     {
-        question: "Define minibatch and epoch in neural network training",
-        answer: "<strong>Key training terminology:</strong><br><br>• <strong>Minibatch (or batch):</strong> A small random sample of training data used in one SGD iteration<br><br>• <strong>Epoch:</strong> One complete pass through the entire training dataset<br><br><strong>Example:</strong> 1000 samples with batch size 100 = 10 batches per epoch",
-        hint: "🔄 Batch = small sample, Epoch = complete dataset pass",
+        question: "How does input specification work in Keras vs PyTorch?",
+        answer: "<strong>Keras:</strong> Only specify <code>input_shape</code> for the first layer. Subsequent layers automatically calculate dimensions from previous outputs.<br><br><strong>PyTorch:</strong> Must explicitly specify input dimensions for every layer.<br><br><strong>Benefit:</strong> Keras is more convenient for sequential architectures.",
+        hint: "🔧 Keras = auto-calculate dimensions, PyTorch = manual specification",
         image: ""
     },
     {
-        question: "Compare three common loss functions for regression",
-        answer: "<strong>Regression loss functions:</strong><br><br>• <strong>MAE (Mean Absolute Error):</strong> Less sensitive to outliers, measures average absolute differences<br><br>• <strong>MSE (Mean Squared Error):</strong> Penalizes larger errors more heavily, smooth gradient<br><br>• <strong>Huber Loss:</strong> Combines MAE and MSE benefits, robust to outliers while maintaining smoothness",
-        hint: "📏 Choose based on how you want to handle outliers",
+        question: "What coding style improves code readability?",
+        answer: "Write <strong>explicit code</strong> rather than abstract imports:<br><br><strong>Good:</strong> <code>keras.models.Sequential()</code> and <code>keras.layers.Dense()</code><br><strong>Less clear:</strong> Direct imports that hide the source<br><br><strong>Benefit:</strong> When reading code later, you immediately know where functions come from.",
+        hint: "💻 Explicit imports = clear code origin and better readability",
+        image: ""
+    },
+    {
+        question: "What is SGD in simple terms?",
+        answer: "SGD is <strong>'random error minimization'</strong>:<br><br>• <strong>Stochastic:</strong> Randomly pick data points<br>• <strong>Gradient:</strong> Find direction on the error curve<br>• <strong>Descent:</strong> Always go toward lower error<br><br>It's like a <strong>ball rolling down to the lowest point</strong> of a curve where error is minimum.",
+        hint: "🏀 Like a ball rolling down to find the lowest error point",
+        image: ""
+    },
+    {
+        question: "How does SGD work step-by-step?",
+        answer: "<strong>SGD Training Process:</strong><br><br>1. Randomly pick a data point (minibatch)<br>2. Make prediction<br>3. Calculate error<br>4. Use derivatives to find direction to reduce error<br>5. Adjust all weights toward lower error<br>6. Repeat with next random point<br><br>This happens <strong>thousands of times</strong> across multiple epochs.",
+        hint: "🔄 Pick → Predict → Calculate → Adjust → Repeat thousands of times",
+        image: ""
+    },
+    {
+        question: "Define minibatch, epoch, and the role of derivatives in training",
+        answer: "<strong>Key training terminology:</strong><br><br>• <strong>Minibatch/Batch:</strong> Small random sample of training data used in one iteration<br>• <strong>Epoch:</strong> One complete pass through entire training dataset<br>• <strong>Derivatives:</strong> Tell us direction to move on error curve (Newton's calculus foundation)",
+        hint: "🎯 Batch = sample, Epoch = full pass, Derivatives = direction finder",
+        image: ""
+    },
+    {
+        question: "How do you choose loss functions for different problems?",
+        answer: "<strong>Loss functions by problem type:</strong><br><br><strong>Regression (continuous values):</strong><br>• MAE (robust to outliers)<br>• MSE (penalizes large errors)<br>• Huber (combines both)<br><br><strong>Binary Classification:</strong> Binary crossentropy<br><strong>Multi-class Classification:</strong> Categorical crossentropy<br><br><strong>Rule:</strong> Different problems need different mathematical tools to measure error.",
+        hint: "🎯 Match loss function to problem type - different tools for different jobs",
         image: ""
     },
     {
         question: "Compare SGD and Adam optimizers",
-        answer: "<strong>SGD vs Adam:</strong><br><br><strong>SGD:</strong><br>• Simple algorithm<br>• Uses fixed learning rate<br>• Can be slow but reliable<br><br><strong>Adam:</strong><br>• Adaptive learning rates<br>• Faster convergence<br>• Combines momentum with adaptive learning<br>• Generally preferred for most applications",
+        answer: "<strong>SGD vs Adam:</strong><br><br><strong>SGD:</strong><br>• Simple, fixed learning rate<br>• Reliable but can be slow<br><br><strong>Adam:</strong><br>• Adaptive learning rates<br>• Faster convergence<br>• Combines momentum with adaptation<br><br><strong>Generally:</strong> Adam preferred for most applications, SGD for specific cases requiring stability.",
         hint: "🏃‍♂️ Adam = smarter, adaptive SGD for faster training",
         image: ""
     },
     {
         question: "How do you compile a Keras model for training?",
-        answer: "<strong>Model compilation syntax:</strong><br><br><code>model.compile(<br>&nbsp;&nbsp;&nbsp;&nbsp;optimizer='adam',<br>&nbsp;&nbsp;&nbsp;&nbsp;loss='mae',<br>&nbsp;&nbsp;&nbsp;&nbsp;metrics=['mae']<br>)</code><br><br><strong>Required components:</strong><br>• <strong>Optimizer:</strong> How to update weights<br>• <strong>Loss function:</strong> What to minimize<br>• <strong>Metrics:</strong> What to track during training",
-        hint: "⚙️ Compile = configure the training process",
+        answer: "<strong>Model compilation syntax:</strong><br><br><code>model.compile(<br>&nbsp;&nbsp;&nbsp;&nbsp;optimizer='adam',<br>&nbsp;&nbsp;&nbsp;&nbsp;loss='mae',  # or appropriate loss function<br>&nbsp;&nbsp;&nbsp;&nbsp;metrics=['mae']  # or ['binary_accuracy'] for classification<br>)</code><br><br>Specify <strong>optimizer</strong>, <strong>loss function</strong>, and <strong>metrics</strong> to track.",
+        hint: "⚙️ Compile = configure the training process (optimizer + loss + metrics)",
         image: ""
     },
     {
-        question: "What is overfitting and what are its signs?",
-        answer: "<strong>Overfitting:</strong> Model learns training data too well, including noise and irrelevant patterns<br><br><strong>Signs of overfitting:</strong><br>• High training accuracy, poor validation/test performance<br>• Training loss decreases while validation loss increases<br>• Large gap between training and validation metrics",
-        hint: "📈📉 Good on training, bad on new data = overfitting",
+        question: "What is overfitting and how do you identify it?",
+        answer: "<strong>Overfitting:</strong> Model learns training data too well, including noise and dataset-specific patterns.<br><br><strong>Signs:</strong><br>• High training accuracy but poor validation performance<br>• Training loss continues decreasing while validation loss starts increasing<br>• Large gap between training and validation metrics",
+        hint: "📈📉 Good on training, bad on validation = overfitting",
         image: ""
     },
     {
-        question: "What is underfitting and how can you identify it?",
-        answer: "<strong>Underfitting:</strong> Model is too simple to capture underlying data patterns<br><br><strong>Signs of underfitting:</strong><br>• Poor performance on both training and validation sets<br>• Loss plateaus at high value for both training and validation<br>• Model seems too simple for task complexity",
+        question: "What is underfitting and its characteristics?",
+        answer: "<strong>Underfitting:</strong> Model is too simple to capture underlying data patterns.<br><br><strong>Signs:</strong><br>• Poor performance on both training AND validation sets<br>• Loss plateaus at high values for both datasets<br>• Model seems too simple for task complexity",
         hint: "😴 Poor performance everywhere = underfitting (too simple)",
         image: ""
     },
     {
-        question: "What is model capacity and how does it relate to overfitting/underfitting?",
-        answer: "<strong>Model capacity:</strong> The complexity and size of a model (number of parameters)<br><br><strong>Relationship:</strong><br>• <strong>Low capacity:</strong> Leads to underfitting<br>• <strong>High capacity:</strong> Can lead to overfitting<br>• <strong>Goal:</strong> Find optimal capacity for best generalization",
-        hint: "⚖️ Goldilocks principle: not too simple, not too complex",
+        question: "How can you visualize different fitting scenarios?",
+        answer: "<strong>Visual understanding of fitting:</strong><br><br>• <strong>Proper fitting:</strong> Smooth curve capturing general data trends<br>• <strong>Overfitting:</strong> Curve going through every point, including noise and tiny deviations<br>• <strong>Underfitting:</strong> Overly simple curve (like straight line) for complex data patterns",
+        hint: "📊 Smooth curve = good, through every point = overfitting, too simple = underfitting",
         image: ""
     },
     {
-        question: "What is early stopping and how does it prevent overfitting?",
-        answer: "<strong>Early stopping:</strong> Monitors validation performance and stops training when validation loss starts increasing while training loss continues decreasing<br><br><strong>Prevention mechanism:</strong><br>• Stops at point of best generalization<br>• Prevents memorization of training data<br>• Automatic regularization technique",
-        hint: "🛑 Stop training at the sweet spot before overfitting begins",
+        question: "What is network capacity and what determines it?",
+        answer: "<strong>Network capacity:</strong> The ability to learn complex relationships, determined by:<br><br>1. <strong>Width:</strong> More neurons per layer (good for linear relationships - 'more manpower')<br>2. <strong>Depth:</strong> More layers (good for nonlinear relationships - 'more management levels')<br><br>More capacity = more intelligence to learn complex patterns.",
+        hint: "🧠 Capacity = intelligence level, Width = manpower, Depth = management levels",
         image: ""
     },
     {
-        question: "How can you increase model capacity in neural networks?",
-        answer: "<strong>Ways to increase capacity:</strong><br><br>• <strong>Add more hidden layers</strong> (deeper network)<br>• <strong>Add more units to existing layers</strong> (wider network)<br>• <strong>Combine both approaches</strong><br><br>Both methods add more parameters for learning complex patterns",
-        hint: "📏📐 Wider OR deeper OR both = more capacity",
+        question: "How does a corporate hierarchy explain network depth?",
+        answer: "<strong>Corporate hierarchy analogy:</strong><br><br>• <strong>Layer 1:</strong> Ground-level employees (basic processing)<br>• <strong>Layer 2:</strong> Managers (access to more info, bigger picture)<br>• <strong>Layer 3+:</strong> Higher management/CEO (sees everything, handles complex patterns)<br><br><strong>Depth = Complicated intelligence:</strong> More layers = more complex problem-solving ability",
+        hint: "🏢 Deeper network = higher management levels = more complex decisions",
+        image: ""
+    },
+    {
+        question: "What is early stopping and why is it crucial?",
+        answer: "<strong>Early stopping:</strong> Monitors validation performance and stops training when validation loss starts increasing while training loss continues decreasing.<br><br>It's like <strong>'quit while you're ahead'</strong> - stop at peak performance before overfitting ruins the model. Don't keep going like Game of Thrones.",
+        hint: "🛑 Stop at the sweet spot - quit while you're ahead!",
         image: ""
     },
     {
         question: "What is dropout and how does it prevent overfitting?",
-        answer: "<strong>Dropout:</strong> Randomly sets a fraction of input units to 0 during training<br><br><strong>Prevention mechanism:</strong><br>• Prevents over-dependence on specific neurons<br>• Forces learning of robust, generalizable features<br>• Creates ensemble effect<br>• Only applied during training, not inference",
-        hint: "🎲 Randomly 'turn off' neurons to prevent over-reliance",
+        answer: "<strong>Dropout:</strong> Randomly sets a fraction of neurons to 0 during training, preventing the network from becoming too dependent on specific neurons.<br><br><strong>Benefits:</strong><br>• Forces learning of more robust, generalizable features<br>• Creates ensemble effect<br>• Applied only during training, not inference",
+        hint: "🎲 Randomly 'turn off' neurons to prevent over-dependence",
         image: ""
     },
     {
-        question: "How do you implement dropout in Keras?",
-        answer: "<strong>Dropout implementation:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(512, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dropout(0.3),  # 30% dropout rate<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1)<br>])</code><br><br>Dropout layer is typically placed <strong>after Dense layers</strong>",
-        hint: "💧 Add Dropout layer after Dense with rate (0.3 = 30%)",
+        question: "How do you add dropout to a Keras model?",
+        answer: "<strong>Dropout implementation:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(512, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dropout(0.3),  # 30% dropout rate<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1)<br>])</code><br><br>Dropout layer placed <strong>after Dense layers</strong>.",
+        hint: "💧 Add Dropout layer after Dense with rate (0.3 = 30% dropout)",
         image: ""
     },
     {
         question: "What is batch normalization and what problems does it solve?",
-        answer: "<strong>Batch normalization:</strong> Normalizes inputs to each layer, making training more stable and faster<br><br><strong>Problems it solves:</strong><br>• Internal covariate shift<br>• Vanishing/exploding gradients<br>• Allows higher learning rates<br>• Acts as mild regularizer",
-        hint: "🔄 Normalize layer inputs = stable, faster training",
+        answer: "<strong>Batch normalization:</strong> Normalizes inputs to each layer, making training more stable and faster.<br><br><strong>Problems it solves:</strong><br>• Internal covariate shift<br>• Vanishing/exploding gradients<br>• Allows higher learning rates<br>• Acts as mild regularization",
+        hint: "🔄 Normalize inputs = stable, faster training",
         image: ""
     },
     {
-        question: "How do you implement batch normalization in Keras?",
-        answer: "<strong>Batch normalization implementation:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(512),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.BatchNormalization(),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Activation('relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1)<br>])</code><br><br>BatchNormalization typically applied <strong>before activation function</strong>",
-        hint: "📊 Order: Dense → BatchNorm → Activation",
+        question: "What's the correct order for combining Dense, BatchNorm, Activation, and Dropout?",
+        answer: "<strong>Standard order:</strong> Dense → BatchNormalization → Activation → Dropout<br><br><code>layers.Dense(units),<br>layers.BatchNormalization(),<br>layers.Activation('relu'),<br>layers.Dropout(rate)</code><br><br>This order optimizes training stability and regularization effectiveness.",
+        hint: "🔢 Remember: Dense → BatchNorm → Activation → Dropout",
         image: ""
     },
     {
-        question: "What is the proper order for Dense, BatchNormalization, Dropout, and Activation layers?",
-        answer: "<strong>Recommended order:</strong> Dense → Batch Normalization → Activation → Dropout<br><br><code>layers.Dense(units),<br>layers.BatchNormalization(),<br>layers.Activation('relu'),<br>layers.Dropout(rate)</code><br><br>This order optimizes training stability and regularization effectiveness",
-        hint: "🔢 Remember sequence: Dense → BatchNorm → Activation → Dropout",
+        question: "How do you set up binary classification in neural networks?",
+        answer: "<strong>Binary classification setup:</strong><br><br>• <strong>Output layer:</strong> 1 neuron with sigmoid activation<br>• <strong>Loss function:</strong> Binary crossentropy<br>• <strong>Metrics:</strong> Binary accuracy<br>• <strong>Output interpretation:</strong> Probability of positive class (0-1)",
+        hint: "🎯 1 neuron + sigmoid + binary_crossentropy = binary classification",
         image: ""
     },
     {
-        question: "How does binary classification differ from regression in neural networks?",
-        answer: "<strong>Key differences:</strong><br><br><strong>Binary Classification:</strong><br>• Predicts one of two classes (0 or 1)<br>• Uses sigmoid activation in output layer<br>• Uses binary crossentropy loss<br><br><strong>Regression:</strong><br>• Predicts continuous values<br>• No activation (linear) in output layer<br>• Uses MSE/MAE loss",
-        hint: "🎯 Classification = categories, Regression = continuous numbers",
+        question: "Create a complete binary classification model in Keras",
+        answer: "<strong>Complete binary classification model:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(4, activation='relu', input_shape=[33]),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(4, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1, activation='sigmoid')  # sigmoid for probability<br>])<br><br>model.compile(<br>&nbsp;&nbsp;&nbsp;&nbsp;optimizer='adam',<br>&nbsp;&nbsp;&nbsp;&nbsp;loss='binary_crossentropy',<br>&nbsp;&nbsp;&nbsp;&nbsp;metrics=['binary_accuracy']<br>)</code>",
+        hint: "🔧 Key components: sigmoid output + binary_crossentropy loss",
         image: ""
     },
     {
-        question: "What is the sigmoid activation function and why use it for binary classification?",
-        answer: "<strong>Sigmoid function:</strong> σ(x) = 1/(1 + e^(-x))<br><br><strong>Properties:</strong><br>• Maps any real number to value between 0 and 1<br>• Perfect for representing probabilities<br>• Output interpreted as probability of positive class<br>• Smooth, differentiable function",
-        hint: "📈 Sigmoid squashes any number into 0-1 probability range",
+        question: "How do accuracy and loss relate to each other?",
+        answer: "<strong>Accuracy vs Loss relationship:</strong><br><br>Accuracy is the ratio of correct predictions to total predictions. Accuracy and error/loss have an <strong>inverse relationship</strong> - higher accuracy means lower error.<br><br><strong>Perfect case:</strong> 100% accuracy means the network learned perfectly (minimum error).",
+        hint: "⚖️ High accuracy = Low loss (inverse relationship)",
         image: ""
     },
     {
-        question: "What is binary crossentropy loss?",
-        answer: "<strong>Binary crossentropy:</strong> Standard loss function for binary classification<br><br><strong>Formula:</strong> -[y*log(p) + (1-y)*log(1-p)]<br>Where y = true label, p = predicted probability<br><br><strong>Purpose:</strong> Measures difference between predicted probabilities and true binary labels",
-        hint: "📏 Measures how far predicted probabilities are from true labels",
+        question: "How do you train and evaluate Keras models?",
+        answer: "<strong>Training and evaluation process:</strong><br><br><code># Training<br>history = model.fit(<br>&nbsp;&nbsp;&nbsp;&nbsp;X_train, y_train,<br>&nbsp;&nbsp;&nbsp;&nbsp;validation_data=(X_valid, y_valid),<br>&nbsp;&nbsp;&nbsp;&nbsp;batch_size=256,<br>&nbsp;&nbsp;&nbsp;&nbsp;epochs=50<br>)<br><br># Evaluation<br>loss, accuracy = model.evaluate(X_test, y_test)<br>predictions = model.predict(X_test)</code>",
+        hint: "🏃‍♂️ fit() = train, evaluate() = performance, predict() = predictions",
         image: ""
     },
     {
-        question: "How do you create a binary classification model in Keras?",
-        answer: "<strong>Binary classification model:</strong><br><br><code>model = keras.Sequential([<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(4, activation='relu', input_shape=[33]),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(4, activation='relu'),<br>&nbsp;&nbsp;&nbsp;&nbsp;layers.Dense(1, activation='sigmoid')  # sigmoid for binary<br>])<br><br>model.compile(<br>&nbsp;&nbsp;&nbsp;&nbsp;optimizer='adam',<br>&nbsp;&nbsp;&nbsp;&nbsp;loss='binary_crossentropy',<br>&nbsp;&nbsp;&nbsp;&nbsp;metrics=['binary_accuracy']<br>)</code>",
-        hint: "🔧 Key: sigmoid output + binary_crossentropy loss",
-        image: ""
-    },
-    {
-        question: "What is keras.Sequential and when should you use it?",
-        answer: "<strong>keras.Sequential:</strong> Easiest way to create neural networks in Keras<br><br><strong>Characteristics:</strong><br>• Creates linear stack of layers<br>• Each layer has one input and one output<br>• Data flows sequentially through layers<br><br><strong>Use when:</strong> Simple, straightforward architectures with linear flow",
-        hint: "📚 Sequential = simple stack, one layer after another",
-        image: ""
-    },
-    {
-        question: "What does layers.Dense represent and what are its key parameters?",
-        answer: "<strong>layers.Dense:</strong> Fully-connected layer where each input connects to each output<br><br><strong>Key parameters:</strong><br>• <strong>units:</strong> number of neurons/outputs<br>• <strong>activation:</strong> activation function to apply<br>• <strong>input_shape:</strong> shape of input data (only needed for first layer)",
-        hint: "🕸️ Dense = every input connected to every output",
-        image: ""
-    },
-    {
-        question: "How do you train a Keras model?",
-        answer: "<strong>Model training with fit():</strong><br><br><code>history = model.fit(<br>&nbsp;&nbsp;&nbsp;&nbsp;X_train, y_train,<br>&nbsp;&nbsp;&nbsp;&nbsp;validation_data=(X_valid, y_valid),<br>&nbsp;&nbsp;&nbsp;&nbsp;batch_size=256,<br>&nbsp;&nbsp;&nbsp;&nbsp;epochs=50,<br>&nbsp;&nbsp;&nbsp;&nbsp;verbose=0  # suppress output<br>)</code><br><br><code>fit()</code> trains the model and returns training history",
-        hint: "🏃‍♂️ fit() does the actual training work",
-        image: ""
-    },
-    {
-        question: "How do you evaluate model performance in Keras?",
-        answer: "<strong>Model evaluation methods:</strong><br><br><strong>Get loss and metrics:</strong><br><code>loss, accuracy = model.evaluate(X_test, y_test)</code><br><br><strong>Make predictions:</strong><br><code>predictions = model.predict(X_test)</code><br><br>Use <strong>evaluate()</strong> for performance metrics, <strong>predict()</strong> for actual predictions",
-        hint: "📊 evaluate() = performance, predict() = actual predictions",
-        image: ""
-    },
-    {
-        question: "When should you use different activation functions?",
-        answer: "<strong>Activation function guidelines:</strong><br><br>• <strong>ReLU:</strong> Default for hidden layers, fast and effective<br>• <strong>Sigmoid:</strong> Output layer for binary classification<br>• <strong>Softmax:</strong> Output layer for multi-class classification<br>• <strong>Linear (no activation):</strong> Output layer for regression<br>• <strong>ELU/SELU:</strong> When needing smooth derivatives or self-normalizing",
-        hint: "🎛️ Choose activation based on layer position and task type",
-        image: ""
-    },
-    {
-        question: "What are good starting values for learning rates?",
-        answer: "<strong>Learning rate effects:</strong><br><br>• <strong>Too high:</strong> Training unstable, loss explodes<br>• <strong>Too low:</strong> Very slow training, may get stuck<br><br><strong>Good starting points:</strong><br>• <strong>SGD:</strong> 0.01<br>• <strong>Adam:</strong> 0.001<br><br>Use learning rate scheduling or adaptive optimizers for best results",
+        question: "How does learning rate affect training and what are good starting values?",
+        answer: "<strong>Learning rate effects:</strong><br><br>• <strong>Too high:</strong> Training unstable, loss explodes<br>• <strong>Too low:</strong> Very slow training, may get stuck<br><br><strong>Good starting points:</strong><br>• 0.01 for SGD<br>• 0.001 for Adam<br><br><strong>Best practice:</strong> Use adaptive optimizers like Adam",
         hint: "⚡ Start with 0.001 for Adam, 0.01 for SGD",
         image: ""
     },
     {
-        question: "List five strategies to prevent overfitting in deep learning",
+        question: "List key strategies to prevent overfitting",
         answer: "<strong>Overfitting prevention strategies:</strong><br><br>1. <strong>Early stopping:</strong> Stop when validation performance stops improving<br>2. <strong>Dropout:</strong> Randomly disable neurons during training<br>3. <strong>Batch normalization:</strong> Normalize layer inputs<br>4. <strong>Reduce model complexity:</strong> Fewer layers/units<br>5. <strong>Data augmentation:</strong> Increase training data variety<br>6. <strong>Regularization:</strong> Add L1/L2 penalty terms",
         hint: "🛡️ Multiple defenses work better than single approach",
         image: ""
     },
     {
         question: "What should you check when your neural network performs poorly?",
-        answer: "<strong>Debugging checklist:</strong><br><br>1. <strong>Data quality:</strong> Errors, missing values, proper preprocessing<br>2. <strong>Model capacity:</strong> Too simple (underfitting) or complex (overfitting)<br>3. <strong>Learning rate:</strong> Too high or too low<br>4. <strong>Loss function:</strong> Appropriate for your task<br>5. <strong>Training time:</strong> Enough epochs vs early stopping<br>6. <strong>Feature scaling:</strong> Normalize/standardize inputs",
+        answer: "<strong>Debugging checklist:</strong><br><br>1. <strong>Data quality:</strong> Errors, missing values, preprocessing<br>2. <strong>Model capacity:</strong> Too simple (underfitting) or complex (overfitting)<br>3. <strong>Learning rate:</strong> Too high/low<br>4. <strong>Loss function:</strong> Appropriate for your task<br>5. <strong>Training time:</strong> Sufficient epochs vs early stopping<br>6. <strong>Feature scaling:</strong> Normalize/standardize inputs",
         hint: "🔍 Systematic debugging: data → model → training → evaluation",
+        image: ""
+    },
+    {
+        question: "Why is neural network training computationally expensive?",
+        answer: "<strong>Training computational expense:</strong><br><br>Training repeatedly processes data points, calculates errors, and updates weights through gradient descent <strong>thousands of times</strong> across multiple epochs.<br><br>For large models like LLMs, this can take <strong>months with thousands of GPUs</strong>, but the principle remains the same as simple networks.",
+        hint: "💰 Thousands of iterations × Multiple epochs = Expensive computation",
+        image: ""
+    },
+    {
+        question: "How can you simplify complex ML terminology?",
+        answer: "<strong>Academic language translation:</strong><br><br>Academic language is often 'standardizable but ununderstandable':<br><br>• <strong>'Stochastic Gradient Descent'</strong> = 'Random error minimization'<br>• <strong>'Gradient descent'</strong> = 'Rolling ball finding lowest point'<br>• <strong>'Model capacity'</strong> = 'Network intelligence'<br><br>The concepts are simpler than the terminology suggests.",
+        hint: "🗣️ Translate academic jargon into simple, understandable concepts",
+        image: ""
+    },
+    {
+        question: "Why is computer vision challenging for machines despite seeming easy for humans?",
+        answer: "<strong>Computer vision complexity:</strong><br><br>For machines, images are just <strong>numbers and probabilities</strong>. Even simple 28x28 pixel classification is computationally intensive.<br><br>Our brain's visual cortex (V1, V2, V3, V4) processes images through <strong>multiple layers of increasing complexity</strong> - neural networks copy this hierarchical structure.",
+        hint: "👁️ Human vision = complex brain hierarchy, machines copy this structure",
+        image: ""
+    },
+    {
+        question: "What information does model.summary() provide?",
+        answer: "<strong>model.summary() information:</strong><br><br>Shows <strong>output shape</strong> of each layer (neurons) and <strong>number of parameters</strong> (weights + biases).<br><br><strong>Calculation example:</strong> Layer with 32 neurons and 3 inputs = 32×3 weights + 32 biases = 128 total parameters.<br><br>This helps understand model complexity and computational requirements.",
+        hint: "📊 Summary = layer shapes + parameter count for complexity understanding",
+        image: ""
+    },
+    {
+        question: "What's the best approach for learning deep learning?",
+        answer: "<strong>Effective learning strategy:</strong><br><br>1. <strong>Start with conceptual understanding:</strong> Use good visualizations<br>2. <strong>Don't rush:</strong> Split learning across 3-4 days<br>3. <strong>Balance theory and practice:</strong> Combine conceptual learning with hands-on coding<br>4. <strong>Focus on intuition first:</strong> Understand concepts before complex implementations<br>5. <strong>Use multiple approaches:</strong> Visualizations for concepts, then code for practice",
+        hint: "🎯 Concepts first → Practice second → Balance both approaches",
         image: ""
     }
 ];
 
-        let currentCard = 0;
-
-        // DOM elements
-        const flashcard = document.getElementById('flashcard');
-        const question = document.getElementById('question');
-        const answer = document.getElementById('answer');
-        const imageContainer = document.getElementById('imageContainer');
-        const cardImage = document.getElementById('cardImage');
-        const hintSection = document.getElementById('hintSection');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-
-        function updateButtonStates() {
-            // Disable Previous button on first card
-            if (currentCard === 0) {
-                prevBtn.disabled = true;
-            } else {
-                prevBtn.disabled = false;
-            }
-            
-            // Disable Next button on last card
-            if (currentCard === flashcards.length - 1) {
-                nextBtn.disabled = true;
-            } else {
-                nextBtn.disabled = false;
-            }
+        function createCard(card, index) {
+            return `
+                <div class="flashcard">
+                    <div class="card-number">${index + 1}</div>
+                    <div class="card-header">
+                        <div class="card-question">${card.question}</div>
+                    </div>
+                    
+                    ${card.image && card.image.trim() !== '' ? `
+                        <div class="card-image-container">
+                            <img src="${card.image}" alt="Learning content" />
+                        </div>
+                    ` : ''}
+                    
+                    <div class="card-body">
+                        <div class="answer-section">
+                            <div class="answer-label">Answer</div>
+                            <div class="card-answer">${card.answer}</div>
+                        </div>
+                        
+                        ${card.hint ? `
+                            <div class="card-hint">${card.hint}</div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
         }
 
-        function updateCard() {
-            const card = flashcards[currentCard];
-            
-            // Add slide-in animation
-            flashcard.style.animation = 'none';
-            flashcard.offsetHeight; // Trigger reflow
-            flashcard.style.animation = 'slideIn 0.5s ease-out';
-            
-            // Update content
-            question.textContent = card.question;
-            answer.innerHTML = card.answer;
-            
-            // Update hint
-            if (card.hint) {
-                hintSection.textContent = card.hint;
-                hintSection.style.display = 'block';
-            } else {
-                hintSection.style.display = 'none';
-            }
-            
-            // Update button states
-            updateButtonStates();
+        function renderCards() {
+            const cardsContainer = document.getElementById('cardsContainer');
+            const cardsHTML = flashcards.map((card, index) => createCard(card, index)).join('');
+            cardsContainer.innerHTML = cardsHTML;
         }
 
-        function nextCard() {
-            currentCard = (currentCard + 1) % flashcards.length;
-            updateCard();
-        }
-
-        function prevCard() {
-            currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
-            updateCard();
-        }
-
-        function shuffleCards() {
-            for (let i = flashcards.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
-            }
-            currentCard = 0;
-            updateCard();
-        }
-
-        // Event listeners
-        nextBtn.addEventListener('click', nextCard);
-        prevBtn.addEventListener('click', prevCard);
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case 'ArrowLeft':
-                    prevCard();
-                    break;
-                case 'ArrowRight':
-                    nextCard();
-                    break;
-                case 'Enter':
-                    e.preventDefault();
-                    nextCard();
-                    break;
-            }
-        });
-
-        // Initialize
-        updateCard();
+        // Initialize cards on page load
+        document.addEventListener('DOMContentLoaded', renderCards);
     </script>
 </body>
 </html>
