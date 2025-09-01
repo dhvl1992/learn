@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Flashcards - Professor's Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .subject-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .subject-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .subject-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .subject-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .card-count {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .status {
+            font-weight: 500;
+        }
+
+        .status.ready {
+            color: #4caf50;
+        }
+
+        .status.coming-soon {
+            color: #ff9800;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+        }
+
+        .shortcuts {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .shortcuts h3 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .shortcuts ul {
+            list-style: none;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .shortcuts li {
+            margin: 5px 0;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .subject-card {
+                padding: 25px;
+            }
+
+            .subject-icon {
+                font-size: 2.5rem;
+            }
+
+            .subject-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            .header {
+                margin-bottom: 30px;
+            }
+
+            .subject-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Subjects</h1>
+            <p>Personal collection of study materials</p>
+        </div>
+
+        <div class="subjects-grid">
+            <a href="deep-learning.html" class="subject-card">
+                <span class="subject-icon">🧠</span>
+                <h2 class="subject-title">Deep Learning</h2>
+                <p class="subject-description">
+                    Neural networks, backpropagation, CNNs, RNNs, and advanced deep learning architectures. 
+                    Covers fundamentals from single neurons to complex models.
+                </p>
+                <div class="subject-meta">
+                    <span class="card-count">35 cards</span>
+                    <span class="status ready">✓ Ready</span>
+                </div>
+            </a>
+
+            <a href="machine-learning.html" class="subject-card">
+                <span class="subject-icon">🤖</span>
+                <h2 class="subject-title">Machine Learning Fundamentals</h2>
+                <p class="subject-description">
+                    Supervised and unsupervised learning, algorithms, feature engineering, model evaluation, 
+                    and core ML concepts every practitioner should know.
+                </p>
+                <div class="subject-meta">
+                    <span class="card-count">0 cards</span>
+                    <span class="status coming-soon">⏳ Coming Soon</span>
+                </div>
+            </a>
+
+            
+
+        <div class="footer">
+            <p>Personal study collection </p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">Organized by Dr. Dhaval Patel</p>
+        </div>
+    </div>
+</body>
+</html>
