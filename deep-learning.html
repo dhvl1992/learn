@@ -63,6 +63,19 @@
             line-height: 1.4;
         }
 
+        .card-image-container {
+            margin: 0 -25px;
+            overflow: hidden;
+        }
+
+        .card-image-container img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+
         .card-body {
             padding: 0 25px 25px;
         }
@@ -138,6 +151,18 @@
             transform: translateY(-1px);
         }
 
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
         .navigation {
             display: flex;
             gap: 10px;
@@ -186,6 +211,14 @@
                 padding: 10px 20px;
                 font-size: 0.9rem;
             }
+
+            .card-image-container {
+                margin: 0 -20px;
+            }
+
+            .card-image-container img {
+                max-height: 200px;
+            }
         }
 
         /* Smooth animations */
@@ -214,6 +247,10 @@
         <div class="flashcard" id="flashcard">
             <div class="card-header">
                 <div class="card-question" id="question">What is the difference between supervised and unsupervised learning?</div>
+            </div>
+
+            <div class="card-image-container" id="imageContainer" style="display: none;">
+                <img id="cardImage" alt="Learning content" />
             </div>
             
             <div class="card-body">
@@ -460,9 +497,27 @@
         const flashcard = document.getElementById('flashcard');
         const question = document.getElementById('question');
         const answer = document.getElementById('answer');
+        const imageContainer = document.getElementById('imageContainer');
+        const cardImage = document.getElementById('cardImage');
         const hintSection = document.getElementById('hintSection');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
+
+        function updateButtonStates() {
+            // Disable Previous button on first card
+            if (currentCard === 0) {
+                prevBtn.disabled = true;
+            } else {
+                prevBtn.disabled = false;
+            }
+            
+            // Disable Next button on last card
+            if (currentCard === flashcards.length - 1) {
+                nextBtn.disabled = true;
+            } else {
+                nextBtn.disabled = false;
+            }
+        }
 
         function updateCard() {
             const card = flashcards[currentCard];
@@ -483,6 +538,9 @@
             } else {
                 hintSection.style.display = 'none';
             }
+            
+            // Update button states
+            updateButtonStates();
         }
 
         function nextCard() {
